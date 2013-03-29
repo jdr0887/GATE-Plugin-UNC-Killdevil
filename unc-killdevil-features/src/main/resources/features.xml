@@ -1,7 +1,7 @@
 <features name="gate-plugin-unc-killdevil-${project.version}">
 
   <feature name="gate-plugin-unc-killdevil" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.renci.gate.plugin.unc.killdevil/unc-killdevil-service/${project.version}</bundle>
+    <bundle>mvn:org.renci.gate.plugins.unc.killdevil/unc-killdevil-service/${project.version}</bundle>
   </feature>
 
 </features>
