@@ -8,16 +8,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.StringUtils;
 import org.renci.gate.AbstractGATEService;
 import org.renci.gate.GlideinMetric;
-import org.renci.jlrm.JLRMException;
 import org.renci.jlrm.Queue;
 import org.renci.jlrm.lsf.LSFJobStatusInfo;
 import org.renci.jlrm.lsf.LSFJobStatusType;
-import org.renci.jlrm.lsf.ssh.LSFSSHFactory;
 import org.renci.jlrm.lsf.ssh.LSFSSHJob;
+import org.renci.jlrm.lsf.ssh.LSFSSHKillCallable;
+import org.renci.jlrm.lsf.ssh.LSFSSHLookupStatusCallable;
+import org.renci.jlrm.lsf.ssh.LSFSSHSubmitCondorGlideinCallable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +40,13 @@ public class KillDevilGATEService extends AbstractGATEService {
 
     @Override
     public Map<String, GlideinMetric> lookupMetrics() {
+        logger.info("ENTERING lookupMetrics()");
         Map<String, GlideinMetric> metricsMap = new HashMap<String, GlideinMetric>();
-        LSFSSHFactory lsfSSHFactory = LSFSSHFactory.getInstance(getSite());
         try {
-            Set<LSFJobStatusInfo> jobStatusSet = lsfSSHFactory.lookupStatus(jobCache);
+
+            LSFSSHLookupStatusCallable callable = new LSFSSHLookupStatusCallable(jobCache, getSite());
+            Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(callable).get();
+
             // get unique list of queues
             Set<String> queueSet = new HashSet<String>();
             if (jobStatusSet != null) {
@@ -86,8 +92,8 @@ public class KillDevilGATEService extends AbstractGATEService {
                 }
             }
 
-        } catch (JLRMException e) {
-            logger.error("Error:", e);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
         return metricsMap;
     }
@@ -107,15 +113,15 @@ public class KillDevilGATEService extends AbstractGATEService {
         try {
             logger.info("siteInfo: {}", getSite());
             logger.info("queueInfo: {}", queue);
-            LSFSSHFactory lsfSSHFactory = LSFSSHFactory.getInstance(getSite());
             String hostAllow = "*.its.unc.edu";
-            job = lsfSSHFactory.submitGlidein(submitDir, this.getCollectorHost(), queue, 40, "glidein", hostAllow,
-                    hostAllow);
+            LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable(getSite(), queue,
+                    submitDir, "glidein", getCollectorHost(), hostAllow, hostAllow, 40);
+            job = Executors.newSingleThreadExecutor().submit(callable).get();
             if (job != null && StringUtils.isNotEmpty(job.getId())) {
                 logger.info("job.getId(): {}", job.getId());
                 jobCache.add(job);
             }
-        } catch (JLRMException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
@@ -127,11 +133,11 @@ public class KillDevilGATEService extends AbstractGATEService {
             try {
                 logger.info("siteInfo: {}", getSite());
                 logger.info("queueInfo: {}", queue);
-                LSFSSHFactory lsfSSHFactory = LSFSSHFactory.getInstance(getSite());
                 LSFSSHJob job = jobCache.get(0);
-                lsfSSHFactory.killGlidein(job.getId());
+                LSFSSHKillCallable callable = new LSFSSHKillCallable(getSite(), job.getId());
+                Executors.newSingleThreadExecutor().submit(callable).get();
                 jobCache.remove(0);
-            } catch (JLRMException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
@@ -139,21 +145,19 @@ public class KillDevilGATEService extends AbstractGATEService {
 
     @Override
     public void deletePendingGlideins() {
+        logger.info("ENTERING deletePendingGlideins()");
         try {
-            LSFSSHFactory lsfSSHFactory = LSFSSHFactory.getInstance(getSite());
-            Set<LSFJobStatusInfo> jobStatusSet = lsfSSHFactory.lookupStatus(jobCache);
+            LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(jobCache, getSite());
+            Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
             for (LSFJobStatusInfo info : jobStatusSet) {
                 if (info.getType().equals(LSFJobStatusType.PENDING)) {
-                    lsfSSHFactory.killGlidein(info.getJobId());
+                    LSFSSHKillCallable killCallable = new LSFSSHKillCallable(getSite(), info.getJobId());
+                    Executors.newSingleThreadExecutor().submit(killCallable).get();
                 }
-                try {
-                    // throttle the deleteGlidein calls such that SSH doesn't complain
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                // throttle the deleteGlidein calls such that SSH doesn't complain
+                Thread.sleep(2000);
             }
-        } catch (JLRMException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
