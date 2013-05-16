@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.renci.gate.plugins.unc</groupId>
   <artifactId>killdevil</artifactId>
-  <version>0.0.11-SNAPSHOT</version>
+  <version>0.0.11</version>
   <packaging>pom</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,7 +26,7 @@
     <renci.jlrm.version>0.2.33</renci.jlrm.version>
     <renci.commons.version>0.2.0</renci.commons.version>
     <slf4j.version>1.7.2</slf4j.version>
-    <gate.version>0.1.16</gate.version>
+    <gate.version>0.1.17</gate.version>
   </properties>
   <url>http://ci-dev.renci.org/site/gate/project-info.html</url>
   <issueManagement>
