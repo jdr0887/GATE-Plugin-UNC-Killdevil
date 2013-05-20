@@ -34,6 +34,8 @@ public class KillDevilGATEService extends AbstractGATEService {
 
     private final List<LSFSSHJob> jobCache = new ArrayList<LSFSSHJob>();
 
+    private String username;
+
     public KillDevilGATEService() {
         super();
     }
@@ -113,9 +115,18 @@ public class KillDevilGATEService extends AbstractGATEService {
         try {
             logger.info("siteInfo: {}", getSite());
             logger.info("queueInfo: {}", queue);
-            String hostAllow = "*.its.unc.edu";
-            LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable(getSite(), queue,
-                    submitDir, "glidein", getCollectorHost(), hostAllow, hostAllow, 40);
+            String hostAllow = "*.unc.edu";
+            LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable();
+            callable.setCollectorHost(getCollectorHost());
+            callable.setHostAllowRead(hostAllow);
+            callable.setHostAllowWrite(hostAllow);
+            callable.setJobName("glidein");
+            callable.setQueue(queue);
+            callable.setRequiredMemory(40);
+            callable.setSite(getSite());
+            callable.setSubmitDir(submitDir);
+            callable.setUsername(username);
+
             job = Executors.newSingleThreadExecutor().submit(callable).get();
             if (job != null && StringUtils.isNotEmpty(job.getId())) {
                 logger.info("job.getId(): {}", job.getId());
@@ -160,6 +171,14 @@ public class KillDevilGATEService extends AbstractGATEService {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
 }
