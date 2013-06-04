@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.renci</groupId>
     <artifactId>gate</artifactId>
-    <version>0.1.23</version>    
+    <version>0.1.24</version>    
   </parent>
   <name>GATE :: Plugins :: UNC :: KillDevil</name>
   <modelVersion>4.0.0</modelVersion>
