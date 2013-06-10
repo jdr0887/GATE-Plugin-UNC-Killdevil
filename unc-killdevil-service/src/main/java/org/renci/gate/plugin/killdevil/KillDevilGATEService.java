@@ -8,11 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.StringUtils;
 import org.renci.gate.AbstractGATEService;
+import org.renci.gate.GATEException;
 import org.renci.gate.GlideinMetric;
 import org.renci.jlrm.Queue;
 import org.renci.jlrm.lsf.LSFJobStatusInfo;
@@ -41,7 +41,7 @@ public class KillDevilGATEService extends AbstractGATEService {
     }
 
     @Override
-    public Map<String, GlideinMetric> lookupMetrics() {
+    public Map<String, GlideinMetric> lookupMetrics() throws GATEException {
         logger.info("ENTERING lookupMetrics()");
         Map<String, GlideinMetric> metricsMap = new HashMap<String, GlideinMetric>();
         try {
@@ -94,14 +94,14 @@ public class KillDevilGATEService extends AbstractGATEService {
                 }
             }
 
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e ) {
+            throw new GATEException(e);
         }
         return metricsMap;
     }
 
     @Override
-    public void createGlidein(Queue queue) {
+    public void createGlidein(Queue queue) throws GATEException {
         logger.info("ENTERING createGlidein(Queue)");
 
         if (StringUtils.isNotEmpty(getActiveQueues()) && !getActiveQueues().contains(queue.getName())) {
@@ -132,13 +132,13 @@ public class KillDevilGATEService extends AbstractGATEService {
                 logger.info("job.getId(): {}", job.getId());
                 jobCache.add(job);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e ) {
+            throw new GATEException(e);
         }
     }
 
     @Override
-    public void deleteGlidein(Queue queue) {
+    public void deleteGlidein(Queue queue) throws GATEException {
         logger.info("ENTERING deleteGlidein(QueueInfo)");
         if (jobCache.size() > 0) {
             try {
@@ -148,14 +148,14 @@ public class KillDevilGATEService extends AbstractGATEService {
                 LSFSSHKillCallable callable = new LSFSSHKillCallable(getSite(), job.getId());
                 Executors.newSingleThreadExecutor().submit(callable).get();
                 jobCache.remove(0);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+            } catch (Exception e ) {
+                throw new GATEException(e);
             }
         }
     }
 
     @Override
-    public void deletePendingGlideins() {
+    public void deletePendingGlideins() throws GATEException {
         logger.info("ENTERING deletePendingGlideins()");
         try {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(jobCache, getSite());
@@ -168,8 +168,8 @@ public class KillDevilGATEService extends AbstractGATEService {
                 // throttle the deleteGlidein calls such that SSH doesn't complain
                 Thread.sleep(2000);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (Exception e ) {
+            throw new GATEException(e);
         }
     }
 
