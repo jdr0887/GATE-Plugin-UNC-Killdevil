@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.renci.gate.plugins.unc</groupId>
     <artifactId>killdevil</artifactId>
-    <version>0.1.6-SNAPSHOT</version>
+    <version>0.1.6</version>
   </parent>
   <name>GATE :: Plugins :: UNC :: KillDevil :: Service</name>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.renci.gate.plugins.unc.killdevil</groupId>
   <artifactId>unc-killdevil-service</artifactId>
-  <version>0.1.6-SNAPSHOT</version>
+  <version>0.1.6</version>
   <packaging>bundle</packaging>
   <dependencies>
     <dependency>
