@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>org.renci</groupId>
+    <groupId>org.renci.gate</groupId>
     <artifactId>gate</artifactId>
-    <version>0.1.27</version>    
+    <version>0.0.3</version>
   </parent>
   <name>GATE :: Plugins :: UNC :: KillDevil</name>
   <modelVersion>4.0.0</modelVersion>
@@ -10,6 +10,9 @@
   <artifactId>killdevil</artifactId>
   <version>0.1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <properties>
+    <renci.gate.version>0.1.29</renci.gate.version>
+  </properties>
   <issueManagement>
     <system>gForge</system>
     <url>https://code.renci.org/gf/project/g_p_u_kd/tracker/</url>
@@ -40,6 +43,15 @@
     <connection>scm:git:ssh://developername@code.renci.org/gitroot/g_p_u_kd</connection>
     <tag>HEAD</tag>
   </scm>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+	<groupId>org.renci.gate</groupId>
+	<artifactId>gate-api</artifactId>
+	<version>${renci.gate.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>unc-killdevil-service</module>
     <module>unc-killdevil-features</module>
