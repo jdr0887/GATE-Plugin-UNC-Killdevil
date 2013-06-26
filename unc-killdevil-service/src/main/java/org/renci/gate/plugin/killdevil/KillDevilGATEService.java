@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,59 +43,53 @@ public class KillDevilGATEService extends AbstractGATEService {
     public Map<String, GlideinMetric> lookupMetrics() throws GATEException {
         logger.info("ENTERING lookupMetrics()");
         Map<String, GlideinMetric> metricsMap = new HashMap<String, GlideinMetric>();
-        try {
 
-            LSFSSHLookupStatusCallable callable = new LSFSSHLookupStatusCallable(jobCache, getSite());
+        try {
+            LSFSSHLookupStatusCallable callable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(callable).get();
+            logger.debug("jobStatusSet.size(): {}", jobStatusSet.size());
 
             // get unique list of queues
             Set<String> queueSet = new HashSet<String>();
-            if (jobStatusSet != null) {
+            if (jobStatusSet != null && jobStatusSet.size() > 0) {
                 for (LSFJobStatusInfo info : jobStatusSet) {
-                    queueSet.add(info.getQueue());
-                }
-            }
-
-            Iterator<LSFSSHJob> jobCacheIter = jobCache.iterator();
-            while (jobCacheIter.hasNext()) {
-                LSFSSHJob job = jobCacheIter.next();
-                for (String queue : queueSet) {
-                    int running = 0;
-                    int pending = 0;
-                    for (LSFJobStatusInfo info : jobStatusSet) {
-                        GlideinMetric metrics = new GlideinMetric();
-                        if (info.getQueue().equals(queue) && job.getId().equals(info.getJobId())) {
-                            switch (info.getType()) {
-                                case PENDING:
-                                    ++pending;
-                                    break;
-                                case RUNNING:
-                                    ++running;
-                                    break;
-                                case EXIT:
-                                case UNKNOWN:
-                                case ZOMBIE:
-                                case DONE:
-                                    jobCacheIter.remove();
-                                    break;
-                                case SUSPENDED_BY_SYSTEM:
-                                case SUSPENDED_BY_USER:
-                                case SUSPENDED_FROM_PENDING:
-                                default:
-                                    break;
-                            }
-                        }
-                        metrics.setQueue(queue);
-                        metrics.setPending(pending);
-                        metrics.setRunning(running);
-                        metricsMap.put(queue, metrics);
+                    if (!queueSet.contains(info.getQueue())) {
+                        queueSet.add(info.getQueue());
                     }
                 }
+
+                for (LSFJobStatusInfo info : jobStatusSet) {
+                    if (metricsMap.containsKey(info.getQueue())) {
+                        continue;
+                    }
+                    if (!"glidein".equals(info.getJobName())) {
+                        continue;
+                    }
+                    metricsMap.put(info.getQueue(), new GlideinMetric(0, 0, info.getQueue()));
+                }
+
+                for (LSFJobStatusInfo info : jobStatusSet) {
+
+                    if (!"glidein".equals(info.getJobName())) {
+                        continue;
+                    }
+
+                    switch (info.getType()) {
+                        case PENDING:
+                            metricsMap.get(info.getQueue()).incrementPending();
+                            break;
+                        case RUNNING:
+                            metricsMap.get(info.getQueue()).incrementRunning();
+                            break;
+                    }
+                }
+
             }
 
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new GATEException(e);
         }
+
         return metricsMap;
     }
 
@@ -132,7 +125,7 @@ public class KillDevilGATEService extends AbstractGATEService {
                 logger.info("job.getId(): {}", job.getId());
                 jobCache.add(job);
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new GATEException(e);
         }
     }
@@ -140,17 +133,14 @@ public class KillDevilGATEService extends AbstractGATEService {
     @Override
     public void deleteGlidein(Queue queue) throws GATEException {
         logger.info("ENTERING deleteGlidein(QueueInfo)");
-        if (jobCache.size() > 0) {
-            try {
-                logger.info("siteInfo: {}", getSite());
-                logger.info("queueInfo: {}", queue);
-                LSFSSHJob job = jobCache.get(0);
-                LSFSSHKillCallable callable = new LSFSSHKillCallable(getSite(), job.getId());
-                Executors.newSingleThreadExecutor().submit(callable).get();
-                jobCache.remove(0);
-            } catch (Exception e ) {
-                throw new GATEException(e);
-            }
+        try {
+            LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
+            Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
+            LSFSSHKillCallable killCallable = new LSFSSHKillCallable(getSite(), jobStatusSet.iterator().next()
+                    .getJobId());
+            Executors.newSingleThreadExecutor().submit(killCallable).get();
+        } catch (Exception e) {
+            throw new GATEException(e);
         }
     }
 
@@ -158,7 +148,7 @@ public class KillDevilGATEService extends AbstractGATEService {
     public void deletePendingGlideins() throws GATEException {
         logger.info("ENTERING deletePendingGlideins()");
         try {
-            LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(jobCache, getSite());
+            LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
             for (LSFJobStatusInfo info : jobStatusSet) {
                 if (info.getType().equals(LSFJobStatusType.PENDING)) {
@@ -168,7 +158,7 @@ public class KillDevilGATEService extends AbstractGATEService {
                 // throttle the deleteGlidein calls such that SSH doesn't complain
                 Thread.sleep(2000);
             }
-        } catch (Exception e ) {
+        } catch (Exception e) {
             throw new GATEException(e);
         }
     }
