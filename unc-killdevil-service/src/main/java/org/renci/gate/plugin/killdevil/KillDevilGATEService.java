@@ -13,7 +13,9 @@ import org.apache.commons.lang.StringUtils;
 import org.renci.gate.AbstractGATEService;
 import org.renci.gate.GATEException;
 import org.renci.gate.GlideinMetric;
+import org.renci.jlrm.JLRMException;
 import org.renci.jlrm.Queue;
+import org.renci.jlrm.commons.ssh.SSHConnectionUtil;
 import org.renci.jlrm.lsf.LSFJobStatusInfo;
 import org.renci.jlrm.lsf.LSFJobStatusType;
 import org.renci.jlrm.lsf.ssh.LSFSSHJob;
@@ -37,6 +39,21 @@ public class KillDevilGATEService extends AbstractGATEService {
 
     public KillDevilGATEService() {
         super();
+    }
+
+    @Override
+    public Boolean isValid() throws GATEException {
+        logger.info("ENTERING isValid()");
+        try {
+            String results = SSHConnectionUtil.execute("ls /nas02/apps | wc -l", getSite().getUsername(), getSite()
+                    .getSubmitHost());
+            if (StringUtils.isNotEmpty(results) && Integer.valueOf(results.trim()) > 0) {
+                return true;
+            }
+        } catch (NumberFormatException | JLRMException e) {
+            throw new GATEException(e);
+        }
+        return false;
     }
 
     @Override
