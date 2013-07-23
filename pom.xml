@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.renci.gate</groupId>
     <artifactId>gate</artifactId>
-    <version>0.0.11</version>
+    <version>0.0.12</version>
   </parent>
   <name>GATE :: Plugins :: UNC :: KillDevil</name>
   <modelVersion>4.0.0</modelVersion>
@@ -11,7 +11,7 @@
   <version>0.1.12-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <renci.gate.version>0.1.37</renci.gate.version>
+    <renci.gate.version>0.1.38</renci.gate.version>
   </properties>
   <issueManagement>
     <system>gForge</system>
