@@ -22,6 +22,7 @@
   <bean id="site" class="org.renci.jlrm.Site">
     <property name="name" value="KillDevil" />
     <property name="project" value="TCGA" />
+    <property name="numberOfProcessors" value="12" />
     <property name="username" value="${username}" />
     <property name="submitHost" value="killdevil.its.unc.edu" />
     <property name="maxTotalPending" value="6" />
