@@ -27,10 +27,10 @@
     <property name="submitHost" value="killdevil.its.unc.edu" />
     <property name="maxTotalPending" value="6" />
     <property name="maxTotalRunning" value="30" />
-    <property name="queueInfoMap">
-      <map>
-        <entry key="week" value-ref="weekQueue" />
-      </map>
+    <property name="queueList">
+      <list>
+        <ref component-id="weekQueue" />
+      </list>
     </property>
   </bean>
 
