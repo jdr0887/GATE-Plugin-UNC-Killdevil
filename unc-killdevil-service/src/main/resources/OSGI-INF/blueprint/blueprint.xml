@@ -4,29 +4,29 @@
 
   <cm:property-placeholder persistent-id="org.renci.gate.plugin.killdevil" update-strategy="reload">
     <cm:default-properties>
+      <cm:property name="submitHost" value="killdevil.its.unc.edu" />
       <cm:property name="collectorHost" value="biodev1.its.unc.edu" />
       <cm:property name="activeQueues" value="week" />
       <cm:property name="username" value="" />
+      <cm:property name="maxPending" value="4" />
+      <cm:property name="maxRunning" value="20" />
     </cm:default-properties>
   </cm:property-placeholder>
 
   <bean id="weekQueue" class="org.renci.jlrm.Queue">
     <property name="name" value="week" />
     <property name="weight" value="0.6" />
-    <property name="maxJobLimit" value="8" />
-    <property name="maxMultipleJobsToSubmit" value="1" />
-    <property name="pendingTime" value="1440" />
-    <property name="runTime" value="2880" />
+    <property name="maxPending" value="${maxPending}" />
+    <property name="maxRunning" value="${maxRunning}" />
+    <property name="runTime" value="5760" />
+    <property name="numberOfProcessors" value="12" />
   </bean>
 
   <bean id="site" class="org.renci.jlrm.Site">
     <property name="name" value="KillDevil" />
     <property name="project" value="TCGA" />
-    <property name="numberOfProcessors" value="12" />
     <property name="username" value="${username}" />
-    <property name="submitHost" value="killdevil.its.unc.edu" />
-    <property name="maxTotalPending" value="6" />
-    <property name="maxTotalRunning" value="30" />
+    <property name="submitHost" value="${submitHost}" />
     <property name="queueList">
       <list>
         <ref component-id="weekQueue" />
