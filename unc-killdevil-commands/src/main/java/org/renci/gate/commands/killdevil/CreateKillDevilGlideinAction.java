@@ -14,16 +14,16 @@ import org.renci.jlrm.lsf.ssh.LSFSSHSubmitCondorGlideinCallable;
 @Command(scope = "renci-blueridge", name = "create-glidein", description = "Create Glidein")
 public class CreateKillDevilGlideinAction extends AbstractAction {
 
-    @Option(name = "username", required = true, multiValued = false)
+    @Option(name = "--username", required = true, multiValued = false)
     private String username;
 
-    @Option(name = "submitHost", required = true, multiValued = false)
+    @Option(name = "--submitHost", required = true, multiValued = false)
     private String submitHost;
 
-    @Option(name = "queueName", required = true, multiValued = false)
+    @Option(name = "--queueName", required = true, multiValued = false)
     private String queueName;
 
-    @Option(name = "collectorHost", required = true, multiValued = false)
+    @Option(name = "--collectorHost", required = true, multiValued = false)
     private String collectorHost;
 
     public CreateKillDevilGlideinAction() {
