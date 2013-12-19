@@ -36,7 +36,7 @@
 	<configuration>
 	  <instructions>
             <Import-Package>*</Import-Package>
-            <Private-Package>org.renci.gate.plugin.killdevil.*</Private-Package>
+            <Private-Package>org.renci.gate.service.killdevil.*</Private-Package>
 	  </instructions>
 	</configuration>
       </plugin>
