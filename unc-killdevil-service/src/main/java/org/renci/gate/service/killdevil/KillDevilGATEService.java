@@ -3,6 +3,7 @@ package org.renci.gate.service.killdevil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -138,9 +139,17 @@ public class KillDevilGATEService extends AbstractGATEService {
         try {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
-            LSFSSHKillCallable killCallable = new LSFSSHKillCallable(getSite(), jobStatusSet.iterator().next()
-                    .getJobId());
-            Executors.newSingleThreadExecutor().submit(killCallable).get();
+            Iterator<LSFJobStatusInfo> iter = jobStatusSet.iterator();
+            while (iter.hasNext()) {
+                LSFJobStatusInfo info = iter.next();
+                if (!info.getJobName().equals("glidein")) {
+                    continue;
+                }
+                logger.debug("deleting: {}", info.toString());
+                LSFSSHKillCallable killCallable = new LSFSSHKillCallable(getSite(), info.getJobId());
+                Executors.newSingleThreadExecutor().submit(killCallable).get();
+                break;
+            }
         } catch (Exception e) {
             throw new GATEException(e);
         }
@@ -153,12 +162,16 @@ public class KillDevilGATEService extends AbstractGATEService {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
             for (LSFJobStatusInfo info : jobStatusSet) {
+                if (!info.getJobName().equals("glidein")) {
+                    continue;
+                }
                 if (info.getType().equals(LSFJobStatusType.PENDING)) {
+                    logger.debug("deleting: {}", info.toString());
                     LSFSSHKillCallable killCallable = new LSFSSHKillCallable(getSite(), info.getJobId());
                     Executors.newSingleThreadExecutor().submit(killCallable).get();
+                    // throttle the deleteGlidein calls such that SSH doesn't complain
+                    Thread.sleep(2000);
                 }
-                // throttle the deleteGlidein calls such that SSH doesn't complain
-                Thread.sleep(2000);
             }
         } catch (Exception e) {
             throw new GATEException(e);
