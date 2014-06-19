@@ -35,11 +35,11 @@ public class CreateKillDevilGlideinAction extends AbstractAction {
         
         Site site = new Site();
         site.setName("Kure");
-        site.setSubmitHost("biodev1.its.unc.edu");
-        site.setUsername("rc_lbg.svc");
+        site.setSubmitHost(submitHost);
+        site.setUsername(username);
 
         Queue queue = new Queue();
-        queue.setName("pseq_tcga");
+        queue.setName(queueName);
         queue.setRunTime(5760L);
         queue.setNumberOfProcessors(8);
 
@@ -48,8 +48,8 @@ public class CreateKillDevilGlideinAction extends AbstractAction {
         try {
 
             LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable();
-            callable.setCollectorHost("gnet641.its.unc.edu");
-            callable.setUsername("rc_lbg.svc");
+            callable.setCollectorHost(collectorHost);
+            callable.setUsername(System.getProperty("user.name"));
             callable.setSite(site);
             callable.setJobName("glidein");
             callable.setQueue(queue);
