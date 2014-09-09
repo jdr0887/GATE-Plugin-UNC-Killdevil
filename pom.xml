@@ -40,9 +40,8 @@
     </license>
   </licenses>
   <scm>
-    <developerConnection>scm:git:ssh://${user.name}@code.renci.org/gitroot/g_p_u_kd</developerConnection>
-    <connection>scm:git:ssh://developername@code.renci.org/gitroot/g_p_u_kd</connection>
-    <tag>HEAD</tag>
+    <developerConnection>scm:git:git@github.com:jdr0887/GATE-Plugin-UNC-Killdevil.git</developerConnection>
+    <connection>scm:git:git@github.com:jdr0887/GATE-Plugin-UNC-Killdevil.git</connection>
   </scm>
   <dependencyManagement>
     <dependencies>
