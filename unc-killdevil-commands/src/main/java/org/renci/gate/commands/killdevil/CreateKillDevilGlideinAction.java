@@ -2,8 +2,8 @@ package org.renci.gate.commands.killdevil;
 
 import java.io.File;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
 import org.renci.jlrm.JLRMException;
 import org.renci.jlrm.Queue;
