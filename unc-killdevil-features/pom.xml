@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.renci.gate.plugins.unc</groupId>
     <artifactId>killdevil</artifactId>
-    <version>0.2.14</version>
+    <version>0.2.15-SNAPSHOT</version>
   </parent>
   <name>GATE :: Plugins :: UNC :: KillDevil :: Features</name>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.renci.gate.plugins.unc.killdevil</groupId>
   <artifactId>unc-killdevil-features</artifactId>
-  <version>0.2.14</version>
+  <version>0.2.15-SNAPSHOT</version>
   <packaging>pom</packaging>
   <build>
     <plugins>
