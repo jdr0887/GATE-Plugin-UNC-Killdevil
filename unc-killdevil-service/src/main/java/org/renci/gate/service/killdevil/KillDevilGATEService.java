@@ -75,7 +75,7 @@ public class KillDevilGATEService extends AbstractGATEService {
 
                 for (LSFJobStatusInfo info : jobStatusSet) {
 
-                    if (!"glidein".equals(info.getJobName())) {
+                    if (!info.getJobName().contains("glidein")) {
                         continue;
                     }
 
@@ -116,7 +116,7 @@ public class KillDevilGATEService extends AbstractGATEService {
             callable.setCollectorHost(getCollectorHost());
             callable.setHostAllowRead(hostAllow);
             callable.setHostAllowWrite(hostAllow);
-            callable.setJobName("glidein");
+            callable.setJobName(String.format("glidein-%s", getSite().getName().toLowerCase()));
             callable.setQueue(queue);
             callable.setRequiredMemory(40);
             callable.setSite(getSite());
@@ -142,7 +142,8 @@ public class KillDevilGATEService extends AbstractGATEService {
             Iterator<LSFJobStatusInfo> iter = jobStatusSet.iterator();
             while (iter.hasNext()) {
                 LSFJobStatusInfo info = iter.next();
-                if (!info.getJobName().equals("glidein")) {
+                String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
+                if (!info.getJobName().equals(jobName)) {
                     continue;
                 }
                 logger.debug("deleting: {}", info.toString());
@@ -162,7 +163,8 @@ public class KillDevilGATEService extends AbstractGATEService {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
             for (LSFJobStatusInfo info : jobStatusSet) {
-                if (!info.getJobName().equals("glidein")) {
+                String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
+                if (!info.getJobName().equals(jobName)) {
                     continue;
                 }
                 if (info.getType().equals(LSFJobStatusType.PENDING)) {
