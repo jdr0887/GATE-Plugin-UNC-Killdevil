@@ -73,9 +73,11 @@ public class KillDevilGATEService extends AbstractGATEService {
 
             if (jobStatusSet != null && jobStatusSet.size() > 0) {
 
+                String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
+
                 for (LSFJobStatusInfo info : jobStatusSet) {
 
-                    if (!info.getJobName().contains("glidein")) {
+                    if (!info.getJobName().equals(jobName)) {
                         continue;
                     }
 
@@ -140,9 +142,9 @@ public class KillDevilGATEService extends AbstractGATEService {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
             Iterator<LSFJobStatusInfo> iter = jobStatusSet.iterator();
+            String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
             while (iter.hasNext()) {
                 LSFJobStatusInfo info = iter.next();
-                String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
                 if (!info.getJobName().equals(jobName)) {
                     continue;
                 }
@@ -162,8 +164,8 @@ public class KillDevilGATEService extends AbstractGATEService {
         try {
             LSFSSHLookupStatusCallable lookupStatusCallable = new LSFSSHLookupStatusCallable(getSite());
             Set<LSFJobStatusInfo> jobStatusSet = Executors.newSingleThreadExecutor().submit(lookupStatusCallable).get();
+            String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
             for (LSFJobStatusInfo info : jobStatusSet) {
-                String jobName = String.format("glidein-%s", getSite().getName().toLowerCase());
                 if (!info.getJobName().equals(jobName)) {
                     continue;
                 }
