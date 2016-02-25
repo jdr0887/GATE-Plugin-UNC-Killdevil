@@ -17,6 +17,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.renci.jlrm.jlrm-lsf</groupId>
       <artifactId>jlrm-lsf-ssh</artifactId>
       <scope>provided</scope>
