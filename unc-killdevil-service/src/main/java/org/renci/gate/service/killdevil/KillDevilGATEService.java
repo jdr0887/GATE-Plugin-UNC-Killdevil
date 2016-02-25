@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KillDevilGATEService extends AbstractGATEService {
 
-    private final Logger logger = LoggerFactory.getLogger(KillDevilGATEService.class);
+    private static final Logger logger = LoggerFactory.getLogger(KillDevilGATEService.class);
 
     private final List<LSFSSHJob> jobCache = new ArrayList<LSFSSHJob>();
 
