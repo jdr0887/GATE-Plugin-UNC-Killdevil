@@ -21,7 +21,6 @@ import org.renci.jlrm.lsf.LSFJobStatusType;
 import org.renci.jlrm.lsf.ssh.LSFSSHJob;
 import org.renci.jlrm.lsf.ssh.LSFSSHKillCallable;
 import org.renci.jlrm.lsf.ssh.LSFSSHLookupStatusCallable;
-import org.renci.jlrm.lsf.ssh.LSFSSHSubmitCondorGlideinCallable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,11 +112,10 @@ public class KillDevilGATEService extends AbstractGATEService {
         try {
             logger.info("siteInfo: {}", getSite());
             logger.info("queueInfo: {}", queue);
-            String hostAllow = "*.unc.edu";
-            LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable();
+            KillDevilSubmitCondorGlideinCallable callable = new KillDevilSubmitCondorGlideinCallable();
             callable.setCollectorHost(getCollectorHost());
-            callable.setHostAllowRead(hostAllow);
-            callable.setHostAllowWrite(hostAllow);
+            callable.setHostAllowRead(getHostAllow());
+            callable.setHostAllowWrite(getHostAllow());
             callable.setJobName(String.format("glidein-%s", getSite().getName().toLowerCase()));
             callable.setQueue(queue);
             callable.setRequiredMemory(40);

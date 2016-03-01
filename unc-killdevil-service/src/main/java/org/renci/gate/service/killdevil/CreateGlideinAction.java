@@ -9,7 +9,6 @@ import org.renci.jlrm.JLRMException;
 import org.renci.jlrm.Queue;
 import org.renci.jlrm.Site;
 import org.renci.jlrm.lsf.ssh.LSFSSHJob;
-import org.renci.jlrm.lsf.ssh.LSFSSHSubmitCondorGlideinCallable;
 
 @Command(scope = "unc-killdevil", name = "create-glidein", description = "Create Glidein")
 public class CreateGlideinAction implements Action {
@@ -26,8 +25,12 @@ public class CreateGlideinAction implements Action {
     @Option(name = "--collectorHost", required = true, multiValued = false)
     private String collectorHost;
 
+    @Option(name = "--hostAllow", required = false, multiValued = false)
+    private String hostAllow;
+
     public CreateGlideinAction() {
         super();
+        this.hostAllow = "*.unc.edu";
     }
 
     @Override
@@ -47,7 +50,7 @@ public class CreateGlideinAction implements Action {
 
         try {
 
-            LSFSSHSubmitCondorGlideinCallable callable = new LSFSSHSubmitCondorGlideinCallable();
+            KillDevilSubmitCondorGlideinCallable callable = new KillDevilSubmitCondorGlideinCallable();
             callable.setCollectorHost(collectorHost);
             callable.setUsername(System.getProperty("user.name"));
             callable.setSite(site);
@@ -98,6 +101,14 @@ public class CreateGlideinAction implements Action {
 
     public void setCollectorHost(String collectorHost) {
         this.collectorHost = collectorHost;
+    }
+
+    public String getHostAllow() {
+        return hostAllow;
+    }
+
+    public void setHostAllow(String hostAllow) {
+        this.hostAllow = hostAllow;
     }
 
 }
